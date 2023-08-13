@@ -1,0 +1,50 @@
+scalar Date
+
+#QUERY==========================================
+type Query {
+    GetUser(username: String, password: String): User
+}
+
+type User {
+    username: String!
+    secret: Secret!
+    preferredName: String!
+    avatar: String!
+    role: Role!
+}
+
+type Secret {
+    hash: String!
+}
+
+type Role {
+    name: String!
+    permissions: [Permission]!
+}
+
+type Permission {
+    module: Module!
+    value: String!
+}
+
+type Module {
+    name: String!
+    url: String!
+}
+
+type Exam {
+    name: String!
+    startTime: Date!
+    durationHours: Int!
+    questions: [Question]!
+}
+
+type Question {
+    prompt: String!,
+    expectedAnswer: String!
+}
+
+#MUTATION========================================
+type Mutation {
+    OverwriteRegistry: Boolean!
+}
