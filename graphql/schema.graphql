@@ -3,6 +3,7 @@ scalar Date
 
 #QUERY==========================================
 type Query {
+    GetUsers: [User!]!
     GetUser(username: String!): User
 }
 

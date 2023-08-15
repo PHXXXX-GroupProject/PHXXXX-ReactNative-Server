@@ -6,6 +6,15 @@ import { Module, Mutation, Permission, Query, QueryGetUserArgs, Role, User } fro
 import { DefaultBinData } from "../lib/enum";
 
 export const QueryResolver = {
+    GetUsers: async (parent: Query, args: any, ctx: any, info: any): Promise<Query["GetUsers"]> => {
+        const cursor =  await Server.db.collection<User>("users").find();
+        const users = [] as User[];
+        for await (const item of cursor) {
+            users.push(item);
+        }
+        return users;
+    },
+
     GetUser: async (parent: Query, args: QueryGetUserArgs, ctx: any, info: any): Promise<Query["GetUser"]> => {
         return await Server.db.collection<User>("users").findOne( {
             username: args.username
