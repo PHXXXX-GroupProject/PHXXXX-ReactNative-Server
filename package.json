@@ -1,19 +1,12 @@
 {
     "devDependencies": {
-        "@graphql-codegen/cli": "1.21.4",
-        "@graphql-codegen/typescript": "1.22.0",
-        "@types/cookie-parser": "^1.4.2",
-        "@types/express": "^4.17.2",
-        "@types/express-session": "^1.15.16",
-        "@types/graphql": "^14.5.0",
-        "@types/mongodb": "^3.6.12",
-        "@types/node": "^8.0.29"
+        "@graphql-codegen/add": "^5.0.0",
+        "@graphql-codegen/cli": "^5.0.0",
+        "@graphql-codegen/typescript": "^4.0.1",
+        "@types/node": "*"
     },
     "dependencies": {
-        "cookie-parser": "^1.4.5",
-        "express": "^4.17.1",
-        "express-graphql": "^0.12.0",
-        "graphql": "^15.5.0",
-        "mongodb": "^3.6.6"
+        "@apollo/server": "^4.9.1",
+        "mongodb": "^5.7.0"
     }
 }

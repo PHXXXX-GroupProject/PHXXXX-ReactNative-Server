@@ -9,8 +9,11 @@ generates:
   "graphql/type.ts":
     schema: "graphql/schema.graphql"
     config:
+      template: "imports.ts"
       scalars: 
-        TrackDb: Record<string, Record<string, Track>>
+        ObjectId: ObjectId
+        Date: Date
     plugins:
       - typescript
-                
+      - add:
+          content: 'import { ObjectId } from "mongodb";'

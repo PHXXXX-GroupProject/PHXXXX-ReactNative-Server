@@ -1,16 +1,19 @@
+scalar ObjectId
 scalar Date
 
 #QUERY==========================================
 type Query {
-    GetUser(username: String, password: String): User
+    GetUser(username: String!): User
 }
 
 type User {
+    _id: ObjectId!
     username: String!
-    secret: Secret!
-    preferredName: String!
-    avatar: String!
+    roleId: ObjectId!
     role: Role!
+    secret: Secret #Must always be null for outsiders
+    preferredName: String
+    avatar: String
 }
 
 type Secret {
@@ -18,28 +21,34 @@ type Secret {
 }
 
 type Role {
+    _id: ObjectId!
     name: String!
-    permissions: [Permission]!
+    permissions: [Permission!]!
 }
 
 type Permission {
+    _id: ObjectId!
+    moduleId: ObjectId!
     module: Module!
     value: String!
 }
 
 type Module {
+    _id: ObjectId!
     name: String!
     url: String!
 }
 
 type Exam {
+    _id: ObjectId!
     name: String!
-    startTime: Date!
+    # startTime: Date!
     durationHours: Int!
     questions: [Question]!
 }
 
 type Question {
+    _id: ObjectId!
     prompt: String!,
     expectedAnswer: String!
 }

@@ -1,16 +1,23 @@
-export enum OperatingSystems {
-    ANDROID = "android",
-    LINUX = "linux",
-    WINDOWS = "win32"
+import { ObjectId } from "bson";
+import { readFileSync } from "fs";
+import { Binary } from "mongodb";
+
+export enum OperationIndex { CREATE, RETRIEVE, UPDATE, DELETE }
+
+export enum ModuleId {
+    USERS = "609de42dc2b27cd8f1401798",
+    THEMES = "609de42dc2b27cd8f1401799",
+    ROLES = "609de42bc2b27cd8f1401797"
 }
 
-export enum MusicDir {
-    TITAN = "/data/data/com.termux/files/home/storage/music",
-    REGULOUS = "/home/assassino/Music",
-    AUTONOE = "C:/Users/assassino/Music",
-    PI = "/media/assassino/5b760d85-19f5-4fd0-8775-083697432096/Music"
+export enum DefaultStrings {
+    HASH = "c4e2f652bd880880515066f567a57659d2212761"
 }
 
-export enum Architecture {
-    ARM = "arm"
+export class DefaultObjectIds {
+    static readonly THEME_ID = new ObjectId("609de42dc2b27cd8f140179c");
+}
+
+export class DefaultBinData {
+    static readonly AVATAR = new Binary(readFileSync(__dirname + "/../media/images/icon_user_default.png"));
 }

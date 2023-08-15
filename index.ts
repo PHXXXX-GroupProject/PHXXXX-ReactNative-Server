@@ -1,7 +1,11 @@
 import { Server } from "./lib/app";
-import { router } from "./lib/router";
 
-//Bind routers
-Server.express.use("/musix", router);
+Server.connectToDatabase().catch(err => {
+    console.log({
+        component: "Database Driver",
+        status: false,
+        error: err.message
+    });
+});
 
 Server.start();
