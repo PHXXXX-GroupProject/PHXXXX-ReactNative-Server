@@ -34,7 +34,13 @@ export type Module = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  OverwriteRegistry: Scalars['Boolean']['output'];
+  SignIn: Scalars['String']['output'];
+};
+
+
+export type MutationSignInArgs = {
+  password: Scalars['String']['input'];
+  username: Scalars['String']['input'];
 };
 
 export type Permission = {
@@ -47,13 +53,8 @@ export type Permission = {
 
 export type Query = {
   __typename?: 'Query';
-  GetUser?: Maybe<User>;
+  GetMe: User;
   GetUsers: Array<User>;
-};
-
-
-export type QueryGetUserArgs = {
-  username: Scalars['String']['input'];
 };
 
 export type Question = {

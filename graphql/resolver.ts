@@ -1,12 +1,27 @@
+import * as crypto from "crypto";
+
+import * as jwt from "jsonwebtoken";
+import { GraphQLError } from "graphql";
 import { ObjectId } from "mongodb";
 import { GraphQLScalarType, Kind } from "graphql";
 
+import * as Error from "../lib/error";
 import { Server } from "../lib/app";
-import { Module, Mutation, Permission, Query, QueryGetUserArgs, Role, User } from "./type";
+import { Module, Mutation, MutationSignInArgs, Permission, Query, Role, User } from "./type";
 import { DefaultBinData } from "../lib/enum";
+import { JWT_SECRET } from "../lib/const";
+import { Context } from "../lib/interface";
 
 export const QueryResolver = {
-    GetUsers: async (parent: Query, args: any, ctx: any, info: any): Promise<Query["GetUsers"]> => {
+    GetMe: async (parent: Query, args: any, ctx: Context, info: any): Promise<Query["GetMe"]> => {
+        if (ctx.user) {
+            return ctx.user;
+        } else {
+            throw new Error.NotSignedInError();
+        }
+    },
+
+    GetUsers: async (parent: Query, args: any, ctx: Context, info: any): Promise<Query["GetUsers"]> => {
         const cursor =  await Server.db.collection<User>("users").find();
         const users = [] as User[];
         for await (const item of cursor) {
@@ -14,17 +29,24 @@ export const QueryResolver = {
         }
         return users;
     },
-
-    GetUser: async (parent: Query, args: QueryGetUserArgs, ctx: any, info: any): Promise<Query["GetUser"]> => {
-        return await Server.db.collection<User>("users").findOne( {
-            username: args.username
-        });
-    }
 };
 
 export const MutationResolver = {
-    OverwriteRegistry: async (parent: Mutation, args: any, ctx: any, info: any): Promise<Mutation["OverwriteRegistry"]> => {
-        return true;
+    SignIn: async (parent: Mutation, args: MutationSignInArgs, ctx: Context, info: any): Promise<Mutation["SignIn"]> => {
+        const user = await Server.db.collection<User>("users").findOne({
+            username: args.username
+        });
+
+        if (user) {
+            const generatedHash = crypto.createHash("sha1").update(args.password).digest("hex");
+            if (generatedHash === user.secret!.hash) {
+                return jwt.sign({ userId: ScalarResolver.ObjectId.serialize(user._id) }, JWT_SECRET);
+            } else {
+                throw new Error.PasswordMismatchError(args.username);
+            }
+        } else {
+            throw new Error.CouldNotFindUserError(args.username);
+        }
     }
 };
 
@@ -36,13 +58,13 @@ export const ScalarResolver = {
             if (value instanceof ObjectId) {
                 return value.toHexString();
             }
-            throw Error(`Error serializing '${value}' from ObjectId`);
+            throw new GraphQLError(`Error serializing "${value}" from ObjectId`);
         },
         parseValue(value) {
             if (value instanceof ObjectId) {
                 return new ObjectId(value);
             }
-            throw Error(`Error parsing '${value}' to ObjectId`);
+            throw new GraphQLError(`Error parsing "${value}" to ObjectId`);
         },
         parseLiteral(valueNode) {
             if (valueNode.kind === Kind.STRING) {
@@ -59,13 +81,13 @@ export const ScalarResolver = {
             if (value instanceof Date) {
                 return value.getTime();
             }
-            throw Error(`Error serializing '${value}' from Date`);
+            throw new GraphQLError(`Error serializing "${value}" from Date`);
         },
         parseValue(value) {
             if (typeof value === "number") {
                 return new Date(value);
             }
-            throw Error(`Error parsing '${value}' to Date`);
+            throw new GraphQLError(`Error parsing "${value}" to Date`);
         },
         parseLiteral(ast) {
             if (ast.kind === Kind.INT) {
@@ -79,12 +101,12 @@ export const ScalarResolver = {
 export const UserResolver = {
     secret: () => null, //DANGER: This field must always return null
 
-    role: async (parent: User, params: any, session: any, info: any) => {
+    role: async (parent: User, args: any, ctx: Context, info: any) => {
         // session.queryPermission(ModuleId.USERS, OperationIndex.RETRIEVE);
         return await Server.db.collection<Role>("roles").findOne({ _id: parent.roleId });
     },
 
-    avatar: async (parent: User, params: any, session: any, info: any) => {
+    avatar: async (parent: User, args: any, ctx: Context, info: any) => {
         if (parent.avatar) {
             return parent.avatar;
         } else {
@@ -95,7 +117,7 @@ export const UserResolver = {
 };
 
 export const PermissionResolver = {
-    module: async (parent: Permission, params: any, session: any, info: any) => {
+    module: async (parent: Permission, args: any, ctx: Context, info: any) => {
         // session.queryPermission(CardId.ROLES, OperationIndex.RETRIEVE);
         return await Server.db.collection<Module>("modules").findOne({ _id: parent.moduleId });
     }

@@ -4,7 +4,7 @@ scalar Date
 #QUERY==========================================
 type Query {
     GetUsers: [User!]!
-    GetUser(username: String!): User
+    GetMe: User!
 }
 
 type User {
@@ -56,5 +56,5 @@ type Question {
 
 #MUTATION========================================
 type Mutation {
-    OverwriteRegistry: Boolean!
+    SignIn(username: String!, password: String!): String!
 }
