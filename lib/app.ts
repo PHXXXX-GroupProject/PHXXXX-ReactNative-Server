@@ -42,9 +42,10 @@ export class Server {
             listen: { port: this.port },
             context: async ({ req, res }): Promise<Context> => {
                 const token = req.headers.authorization || '';
+                
                 try {
                     const result = jwt.verify(token, JWT_SECRET) as any;
-                    const user = await Server.db.collection<User>("users").findOne({ _id: result.userId }) as User;
+                    const user = await Server.db.collection<User>("users").findOne({ username: result.userId }) as User;
     
                     user.role = await Server.db.collection<Role>("roles").findOne({ _id: user.roleId }) as Role;
     

@@ -8,12 +8,14 @@ import { GraphQLScalarType, Kind } from "graphql";
 import * as Error from "../lib/error";
 import { Server } from "../lib/app";
 import { Module, Mutation, MutationSignInArgs, Permission, Query, Role, User } from "./type";
-import { DefaultBinData } from "../lib/enum";
+import { DefaultBinData, ModuleId, OperationIndex } from "../lib/enum";
 import { JWT_SECRET } from "../lib/const";
 import { Context } from "../lib/interface";
+import { PermissionManager } from "../lib/util";
 
 export const QueryResolver = {
     GetMe: async (parent: Query, args: any, ctx: Context, info: any): Promise<Query["GetMe"]> => {
+        //WARNING: GetMe doesn't need any permission validation
         if (ctx.user) {
             return ctx.user;
         } else {
@@ -22,12 +24,8 @@ export const QueryResolver = {
     },
 
     GetUsers: async (parent: Query, args: any, ctx: Context, info: any): Promise<Query["GetUsers"]> => {
-        const cursor =  await Server.db.collection<User>("users").find();
-        const users = [] as User[];
-        for await (const item of cursor) {
-            users.push(item);
-        }
-        return users;
+        PermissionManager.queryPermission(ctx.user, ModuleId.USERS, OperationIndex.RETRIEVE);
+        return await Server.db.collection<User>("users").find().toArray();
     },
 };
 
@@ -102,7 +100,7 @@ export const UserResolver = {
     secret: () => null, //DANGER: This field must always return null
 
     role: async (parent: User, args: any, ctx: Context, info: any) => {
-        // session.queryPermission(ModuleId.USERS, OperationIndex.RETRIEVE);
+        PermissionManager.queryPermission(ctx.user, ModuleId.ROLES, OperationIndex.RETRIEVE);
         return await Server.db.collection<Role>("roles").findOne({ _id: parent.roleId });
     },
 
@@ -118,7 +116,7 @@ export const UserResolver = {
 
 export const PermissionResolver = {
     module: async (parent: Permission, args: any, ctx: Context, info: any) => {
-        // session.queryPermission(CardId.ROLES, OperationIndex.RETRIEVE);
+        //WARNING: Module details can be accessed by anyone
         return await Server.db.collection<Module>("modules").findOne({ _id: parent.moduleId });
     }
 };

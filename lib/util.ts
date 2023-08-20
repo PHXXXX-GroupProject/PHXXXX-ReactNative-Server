@@ -1,11 +1,23 @@
-export class UUID {
-    public static generateNew(){
-        var date = new Date().getTime();
-        var uuid = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(c) {
-            var r = (date + Math.random()*16)%16 | 0;
-            date = Math.floor(date/16);
-            return (c=="x" ? r :(r&0x3|0x8)).toString(16);
-        });
-        return uuid;
+import * as Error from "./error";
+import { Role, User } from "../graphql/type";
+import { Server } from "./app";
+import { ModuleId, OperationIndex } from "./enum";
+
+export class PermissionManager {
+    static async queryPermission(user: User | null, moduleId: ModuleId, operationIndex: OperationIndex) {
+        if (user) {
+            const role = await Server.db.collection<Role>("roles").findOne({
+                _id: user.roleId
+            }) as Role;
+    
+            for (const permission of role.permissions) {
+                if (permission.moduleId.toHexString() === moduleId && permission.value[operationIndex] === "1") {
+                    return true;
+                }
+            }
+            throw new Error.NoPermissionsError(role, moduleId, operationIndex);
+        } else {
+            throw new Error.NotSignedInError();
+        }
     }
 }

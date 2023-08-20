@@ -1,5 +1,6 @@
 import { GraphQLError } from "graphql";
 import { OperationIndex } from "./enum";
+import { Role } from "../graphql/type";
 
 export class CouldNotFindUserError extends GraphQLError {
     constructor(username: string) {
@@ -24,11 +25,11 @@ export class PasswordMismatchError extends GraphQLError {
 }
 
 export class NoPermissionsError extends GraphQLError {
-    constructor(roleId: string, cardId: string, operationIndex: OperationIndex) {
-        super(`Permissions denied to perform operation ${operationIndex} on card ${cardId} for role ${roleId}`, null, null, null, null, null, {
+    constructor(role: Role, moduleId: string, operation: OperationIndex) {
+        super(`Permissions denied to perform operation ${operation} on module ${moduleId} for role ${role.name}`, null, null, null, null, null, {
             title: "Whoa! Go no further",
             suggestion: "Check your permissions",
-            description: "Looks like you don't have permissions for the requested operation",
+            description: "Looks like you don't have sufficient permissions for the requested operation",
             code: "NO_PERMISSIONS"
         });
     }
