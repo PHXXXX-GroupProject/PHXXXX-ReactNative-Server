@@ -2,7 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 
 import * as jwt from "jsonwebtoken";
-import { Db, MongoClient } from "mongodb";
+import { Db, MongoClient, ObjectId } from "mongodb";
 import { ApolloServer, } from "@apollo/server";
 import { startStandaloneServer } from "@apollo/server/standalone";
 
@@ -42,15 +42,16 @@ export class Server {
             listen: { port: this.port },
             context: async ({ req, res }): Promise<Context> => {
                 const token = req.headers.authorization || '';
-                
                 try {
                     const result = jwt.verify(token, JWT_SECRET) as any;
-                    const user = await Server.db.collection<User>("users").findOne({ username: result.userId }) as User;
-    
+
+                    const user = await Server.db.collection<User>("users").findOne({ _id: new ObjectId(result.userId) }) as User;
+
                     user.role = await Server.db.collection<Role>("roles").findOne({ _id: user.roleId }) as Role;
     
                     return { user };
-                } catch {
+                } catch(err) {
+                    console.error(err);
                     return { user: null };
                 }
             }
