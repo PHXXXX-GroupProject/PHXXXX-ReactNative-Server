@@ -2,7 +2,7 @@ import { GraphQLError } from "graphql";
 import { OperationIndex } from "./enum";
 import { Role } from "../graphql/type";
 
-export class CouldNotFindUserError extends GraphQLError {
+export class CouldNotFindUser extends GraphQLError {
     constructor(username: string) {
         super(`No user as ${username}`, null, null, null, null, null, {
             title: "Couldn't find that user",
@@ -13,7 +13,7 @@ export class CouldNotFindUserError extends GraphQLError {
     }
 }
 
-export class PasswordMismatchError extends GraphQLError {
+export class PasswordMismatch extends GraphQLError {
     constructor(username: string) {
         super(`Incorrect password for user ${username}`, null, null, null, null, null, {
             title: "Oops! password mismatch",
@@ -24,7 +24,7 @@ export class PasswordMismatchError extends GraphQLError {
     }
 }
 
-export class NoPermissionsError extends GraphQLError {
+export class NoPermissions extends GraphQLError {
     constructor(role: Role, moduleId: string, operation: OperationIndex) {
         super(`Permissions denied to perform operation ${operation} on module ${moduleId} for role ${role.name}`, null, null, null, null, null, {
             title: "Whoa! Go no further",
@@ -35,7 +35,7 @@ export class NoPermissionsError extends GraphQLError {
     }
 }
 
-export class NotSignedInError extends GraphQLError {
+export class NotSignedIn extends GraphQLError {
     constructor() {
         super("No user for session", null, null, null, null, null, {
             title: "You're not signed in",
@@ -46,7 +46,7 @@ export class NotSignedInError extends GraphQLError {
     }
 }
 
-export class AttemptedSelfDestructionError extends GraphQLError {
+export class AttemptedSelfDestruction extends GraphQLError {
     constructor() {
         super("Attempted self deletion", null, null, null, null, null, {
             title: "Cannot delete yourself",

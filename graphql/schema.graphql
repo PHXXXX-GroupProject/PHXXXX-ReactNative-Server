@@ -3,8 +3,10 @@ scalar Date
 
 #QUERY==========================================
 type Query {
-    GetUsers: [User!]!
     GetMe: User!
+    GetUser(username: String!): User
+    GetUsers: [User!]!
+    GetRoles: [Role!]!
 }
 
 type User {
@@ -12,7 +14,7 @@ type User {
     username: String!
     roleId: ObjectId!
     role: Role!
-    secret: Secret #Must always be null for outsiders
+    secret: Secret #DANGER: Must always be null for outsiders
     preferredName: String
     avatar: String
 }
@@ -43,7 +45,7 @@ type Module {
 type Exam {
     _id: ObjectId!
     name: String!
-    # startTime: Date!
+    startTime: Date!
     durationHours: Int!
     questions: [Question]!
 }

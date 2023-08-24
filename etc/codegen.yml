@@ -17,3 +17,12 @@ generates:
       - typescript
       - add:
           content: 'import { ObjectId } from "mongodb";'
+  "../Client/lib/type.ts":
+    schema: "graphql/schema.graphql"
+    config:
+      template: "imports.ts"
+      scalars: 
+        ObjectId: string
+        Date: Date
+    plugins:
+      - typescript

@@ -7,7 +7,7 @@ import { GraphQLScalarType, Kind } from "graphql";
 
 import * as Error from "../lib/error";
 import { Server } from "../lib/app";
-import { Module, Mutation, MutationSignInArgs, Permission, Query, Role, User } from "./type";
+import { Module, Mutation, MutationSignInArgs, Permission, Query, QueryGetUserArgs, Role, User } from "./type";
 import { DefaultBinData, ModuleId, OperationIndex } from "../lib/enum";
 import { JWT_SECRET } from "../lib/const";
 import { Context } from "../lib/interface";
@@ -19,13 +19,25 @@ export const QueryResolver = {
         if (ctx.user) {
             return ctx.user;
         } else {
-            throw new Error.NotSignedInError();
+            throw new Error.NotSignedIn();
         }
+    },
+
+    GetUser: async (parent: Query, args: QueryGetUserArgs, ctx: Context, info: any): Promise<Query["GetUser"]> => {
+        PermissionManager.queryPermission(ctx.user, ModuleId.USERS, OperationIndex.RETRIEVE);
+        return await Server.db.collection<User>("users").findOne({
+            username: args.username
+        });
     },
 
     GetUsers: async (parent: Query, args: any, ctx: Context, info: any): Promise<Query["GetUsers"]> => {
         PermissionManager.queryPermission(ctx.user, ModuleId.USERS, OperationIndex.RETRIEVE);
         return await Server.db.collection<User>("users").find().toArray();
+    },
+
+    GetRoles: async (parent: Query, args: any, ctx: Context, info: any): Promise<Query["GetRoles"]> => {
+        PermissionManager.queryPermission(ctx.user, ModuleId.ROLES, OperationIndex.RETRIEVE);
+        return await Server.db.collection<Role>("roles").find().toArray();
     },
 };
 
@@ -40,10 +52,10 @@ export const MutationResolver = {
             if (generatedHash === user.secret!.hash) {
                 return jwt.sign({ userId: ScalarResolver.ObjectId.serialize(user._id) }, JWT_SECRET);
             } else {
-                throw new Error.PasswordMismatchError(args.username);
+                throw new Error.PasswordMismatch(args.username);
             }
         } else {
-            throw new Error.CouldNotFindUserError(args.username);
+            throw new Error.CouldNotFindUser(args.username);
         }
     }
 };

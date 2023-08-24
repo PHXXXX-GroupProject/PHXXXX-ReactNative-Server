@@ -23,6 +23,7 @@ export type Exam = {
   durationHours: Scalars['Int']['output'];
   name: Scalars['String']['output'];
   questions: Array<Maybe<Question>>;
+  startTime: Scalars['Date']['output'];
 };
 
 export type Module = {
@@ -54,7 +55,14 @@ export type Permission = {
 export type Query = {
   __typename?: 'Query';
   GetMe: User;
+  GetRoles: Array<Role>;
+  GetUser?: Maybe<User>;
   GetUsers: Array<User>;
+};
+
+
+export type QueryGetUserArgs = {
+  username: Scalars['String']['input'];
 };
 
 export type Question = {

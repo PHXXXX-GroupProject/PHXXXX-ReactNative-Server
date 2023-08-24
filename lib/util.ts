@@ -15,9 +15,9 @@ export class PermissionManager {
                     return true;
                 }
             }
-            throw new Error.NoPermissionsError(role, moduleId, operationIndex);
+            throw new Error.NoPermissions(role, moduleId, operationIndex);
         } else {
-            throw new Error.NotSignedInError();
+            throw new Error.NotSignedIn();
         }
     }
 }
