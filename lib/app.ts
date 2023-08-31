@@ -7,7 +7,7 @@ import { ApolloServer, } from "@apollo/server";
 import { startStandaloneServer } from "@apollo/server/standalone";
 
 import { Role, User } from "../graphql/type";
-import { MutationResolver, PermissionResolver, QueryResolver, ScalarResolver, UserResolver } from "../graphql/resolver";
+import { ExamResolver, MutationResolver, PermissionResolver, QueryResolver, ScalarResolver, UserResolver } from "../graphql/resolver";
 import { JWT_SECRET } from "./const";
 import { Context } from "./interface";
 
@@ -23,7 +23,8 @@ export class Server {
             Query: QueryResolver,
             Mutation: MutationResolver,
             User: UserResolver,
-            Permission: PermissionResolver
+            Permission: PermissionResolver,
+            Exam: ExamResolver
         },
     });
 

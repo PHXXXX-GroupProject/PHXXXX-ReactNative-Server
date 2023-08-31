@@ -4,9 +4,12 @@ scalar Date
 #QUERY==========================================
 type Query {
     GetMe: User!
-    GetUser(username: String!): User
+    GetUser(id: ObjectId!): User
+    GetRole(id: ObjectId!): Role
+    GetExam(id: ObjectId!): Exam
     GetUsers: [User!]!
     GetRoles: [Role!]!
+    GetExams: [Exam!]!
 }
 
 type User {
@@ -47,13 +50,26 @@ type Exam {
     name: String!
     startTime: Date!
     durationHours: Int!
-    questions: [Question]!
+    questionIds: [ObjectId!]!
+    questions: [Question!]!
 }
 
 type Question {
     _id: ObjectId!
-    prompt: String!,
-    expectedAnswer: String!
+    prompt: String!
+}
+
+type ExamSitting {
+    _id: ObjectId!
+    exam: Exam!
+    user: User!
+    answers: [Answer!]!
+}
+
+type Answer {
+    _id: ObjectId!
+    questionId: ObjectId!
+    text: String!
 }
 
 #MUTATION========================================

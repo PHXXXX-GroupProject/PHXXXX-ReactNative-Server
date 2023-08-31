@@ -7,7 +7,7 @@ import { GraphQLScalarType, Kind } from "graphql";
 
 import * as Error from "../lib/error";
 import { Server } from "../lib/app";
-import { Module, Mutation, MutationSignInArgs, Permission, Query, QueryGetUserArgs, Role, User } from "./type";
+import { Exam, Module, Mutation, MutationSignInArgs, Permission, Query, QueryGetUserArgs, Question, Role, User } from "./type";
 import { DefaultBinData, ModuleId, OperationIndex } from "../lib/enum";
 import { JWT_SECRET } from "../lib/const";
 import { Context } from "../lib/interface";
@@ -26,7 +26,21 @@ export const QueryResolver = {
     GetUser: async (parent: Query, args: QueryGetUserArgs, ctx: Context, info: any): Promise<Query["GetUser"]> => {
         PermissionManager.queryPermission(ctx.user, ModuleId.USERS, OperationIndex.RETRIEVE);
         return await Server.db.collection<User>("users").findOne({
-            username: args.username
+            _id: args.id
+        });
+    },
+
+    GetRole: async (parent: Query, args: QueryGetUserArgs, ctx: Context, info: any): Promise<Query["GetRole"]> => {
+        PermissionManager.queryPermission(ctx.user, ModuleId.ROLES, OperationIndex.RETRIEVE);
+        return await Server.db.collection<Role>("roles").findOne({
+            _id: args.id
+        });
+    },
+
+    GetExam: async (parent: Query, args: QueryGetUserArgs, ctx: Context, info: any): Promise<Query["GetExam"]> => {
+        PermissionManager.queryPermission(ctx.user, ModuleId.EXAMS, OperationIndex.RETRIEVE);
+        return await Server.db.collection<Exam>("exams").findOne({
+            _id: args.id
         });
     },
 
@@ -38,6 +52,11 @@ export const QueryResolver = {
     GetRoles: async (parent: Query, args: any, ctx: Context, info: any): Promise<Query["GetRoles"]> => {
         PermissionManager.queryPermission(ctx.user, ModuleId.ROLES, OperationIndex.RETRIEVE);
         return await Server.db.collection<Role>("roles").find().toArray();
+    },
+
+    GetExams: async (parent: Query, args: any, ctx: Context, info: any): Promise<Query["GetExams"]> => {
+        PermissionManager.queryPermission(ctx.user, ModuleId.EXAMS, OperationIndex.RETRIEVE);
+        return await Server.db.collection<Exam>("exams").find().toArray();
     },
 };
 
@@ -132,3 +151,12 @@ export const PermissionResolver = {
         return await Server.db.collection<Module>("modules").findOne({ _id: parent.moduleId });
     }
 };
+
+export const ExamResolver = {
+    questions: async (parent: Exam, args: any, ctx: Context, info: any) => {
+        PermissionManager.queryPermission(ctx.user, ModuleId.QUESTIONS, OperationIndex.RETRIEVE);
+        return await Server.db.collection<Question>("questions").find({
+            _id: { $in: parent.questionIds }
+        }).toArray();
+    }
+}

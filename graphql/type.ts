@@ -17,13 +17,29 @@ export type Scalars = {
   ObjectId: { input: ObjectId; output: ObjectId; }
 };
 
+export type Answer = {
+  __typename?: 'Answer';
+  _id: Scalars['ObjectId']['output'];
+  questionId: Scalars['ObjectId']['output'];
+  text: Scalars['String']['output'];
+};
+
 export type Exam = {
   __typename?: 'Exam';
   _id: Scalars['ObjectId']['output'];
   durationHours: Scalars['Int']['output'];
   name: Scalars['String']['output'];
-  questions: Array<Maybe<Question>>;
+  questionIds: Array<Scalars['ObjectId']['output']>;
+  questions: Array<Question>;
   startTime: Scalars['Date']['output'];
+};
+
+export type ExamSitting = {
+  __typename?: 'ExamSitting';
+  _id: Scalars['ObjectId']['output'];
+  answers: Array<Answer>;
+  exam: Exam;
+  user: User;
 };
 
 export type Module = {
@@ -54,21 +70,33 @@ export type Permission = {
 
 export type Query = {
   __typename?: 'Query';
+  GetExam?: Maybe<Exam>;
+  GetExams: Array<Exam>;
   GetMe: User;
+  GetRole?: Maybe<Role>;
   GetRoles: Array<Role>;
   GetUser?: Maybe<User>;
   GetUsers: Array<User>;
 };
 
 
+export type QueryGetExamArgs = {
+  id: Scalars['ObjectId']['input'];
+};
+
+
+export type QueryGetRoleArgs = {
+  id: Scalars['ObjectId']['input'];
+};
+
+
 export type QueryGetUserArgs = {
-  username: Scalars['String']['input'];
+  id: Scalars['ObjectId']['input'];
 };
 
 export type Question = {
   __typename?: 'Question';
   _id: Scalars['ObjectId']['output'];
-  expectedAnswer: Scalars['String']['output'];
   prompt: Scalars['String']['output'];
 };
 
