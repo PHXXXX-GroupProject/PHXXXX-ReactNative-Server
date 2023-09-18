@@ -7,7 +7,7 @@ import { GraphQLScalarType, Kind } from "graphql";
 
 import * as Error from "../lib/error";
 import { Server } from "../lib/app";
-import { Exam, Module, Mutation, MutationSignInArgs, Permission, Query, QueryGetUserArgs, Question, Role, User } from "./type";
+import { Fine, Module, Mutation, MutationSignInArgs, Offense, Permission, Query, QueryGetUserArgs, Role, User } from "./type";
 import { DefaultBinData, ModuleId, OperationIndex } from "../lib/enum";
 import { JWT_SECRET } from "../lib/const";
 import { Context } from "../lib/interface";
@@ -37,13 +37,6 @@ export const QueryResolver = {
         });
     },
 
-    GetExam: async (parent: Query, args: QueryGetUserArgs, ctx: Context, info: any): Promise<Query["GetExam"]> => {
-        PermissionManager.queryPermission(ctx.user, ModuleId.EXAMS, OperationIndex.RETRIEVE);
-        return await Server.db.collection<Exam>("exams").findOne({
-            _id: args.id
-        });
-    },
-
     GetUsers: async (parent: Query, args: any, ctx: Context, info: any): Promise<Query["GetUsers"]> => {
         PermissionManager.queryPermission(ctx.user, ModuleId.USERS, OperationIndex.RETRIEVE);
         return await Server.db.collection<User>("users").find().toArray();
@@ -52,12 +45,7 @@ export const QueryResolver = {
     GetRoles: async (parent: Query, args: any, ctx: Context, info: any): Promise<Query["GetRoles"]> => {
         PermissionManager.queryPermission(ctx.user, ModuleId.ROLES, OperationIndex.RETRIEVE);
         return await Server.db.collection<Role>("roles").find().toArray();
-    },
-
-    GetExams: async (parent: Query, args: any, ctx: Context, info: any): Promise<Query["GetExams"]> => {
-        PermissionManager.queryPermission(ctx.user, ModuleId.EXAMS, OperationIndex.RETRIEVE);
-        return await Server.db.collection<Exam>("exams").find().toArray();
-    },
+    }
 };
 
 export const MutationResolver = {
@@ -142,7 +130,12 @@ export const UserResolver = {
             //Return the default avatar
             return DefaultBinData.AVATAR;
         }
-    }
+    },
+
+    fines: async (parent: User, args: any, ctx: Context, info: any) => {
+        PermissionManager.queryPermission(ctx.user, ModuleId.FINES, OperationIndex.RETRIEVE);
+        return await Server.db.collection<Fine>("fines").find({ offenderId: { $in: [parent._id] } }).toArray();
+    },
 };
 
 export const PermissionResolver = {
@@ -152,11 +145,19 @@ export const PermissionResolver = {
     }
 };
 
-export const ExamResolver = {
-    questions: async (parent: Exam, args: any, ctx: Context, info: any) => {
-        PermissionManager.queryPermission(ctx.user, ModuleId.QUESTIONS, OperationIndex.RETRIEVE);
-        return await Server.db.collection<Question>("questions").find({
-            _id: { $in: parent.questionIds }
-        }).toArray();
-    }
+export const FineResolver = {
+    offender: async (parent: Fine, args: any, ctx: Context, info: any) => {
+        PermissionManager.queryPermission(ctx.user, ModuleId.USERS, OperationIndex.RETRIEVE);
+        return await Server.db.collection<User>("users").findOne({_id: parent.offenderId });
+    },
+
+    officer: async (parent: Fine, args: any, ctx: Context, info: any) => {
+        PermissionManager.queryPermission(ctx.user, ModuleId.USERS, OperationIndex.RETRIEVE);
+        return await Server.db.collection<User>("users").findOne({_id: parent.officerId });
+    },
+
+    offenses: async (parent: Fine, args: any, ctx: Context, info: any) => {
+        PermissionManager.queryPermission(ctx.user, ModuleId.OFFENSES, OperationIndex.RETRIEVE);
+        return await Server.db.collection<Offense>("offenses").find({ _id: { $in: parent.offenseIds } }).toArray();
+    },
 }

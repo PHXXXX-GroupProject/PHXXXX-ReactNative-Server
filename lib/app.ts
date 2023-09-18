@@ -7,7 +7,7 @@ import { ApolloServer, } from "@apollo/server";
 import { startStandaloneServer } from "@apollo/server/standalone";
 
 import { Role, User } from "../graphql/type";
-import { ExamResolver, MutationResolver, PermissionResolver, QueryResolver, ScalarResolver, UserResolver } from "../graphql/resolver";
+import { FineResolver, MutationResolver, PermissionResolver, QueryResolver, ScalarResolver, UserResolver } from "../graphql/resolver";
 import { JWT_SECRET } from "./const";
 import { Context } from "./interface";
 
@@ -24,17 +24,17 @@ export class Server {
             Mutation: MutationResolver,
             User: UserResolver,
             Permission: PermissionResolver,
-            Exam: ExamResolver
+            Fine: FineResolver
         },
     });
 
     static async connectToDatabase() {
         await this.dbDriver.connect();
-        this.db = this.dbDriver.db("exam");
+        this.db = this.dbDriver.db("finePay");
         console.log({
             component: "Database Driver",
             status: true,
-            database: "exam"
+            database: "finePay"
         });
     }
 
