@@ -71,9 +71,9 @@ export type Permission = {
 export type Query = {
   __typename?: 'Query';
   GetMe: User;
-  GetRole?: Maybe<Role>;
+  GetRole: Role;
   GetRoles: Array<Role>;
-  GetUser?: Maybe<User>;
+  GetUser: User;
   GetUsers: Array<User>;
 };
 

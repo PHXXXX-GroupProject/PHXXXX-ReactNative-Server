@@ -7,13 +7,13 @@ import { GraphQLScalarType, Kind } from "graphql";
 
 import * as Error from "../lib/error";
 import { Server } from "../lib/app";
-import { Fine, Module, Mutation, MutationSignInArgs, Offense, Permission, Query, QueryGetUserArgs, Role, User } from "./type";
+import { Fine, Module, Mutation, MutationSignInArgs, Offense, Permission, Query, QueryGetRoleArgs, QueryGetUserArgs, Role, User } from "./type";
 import { DefaultBinData, ModuleId, OperationIndex } from "../lib/enum";
 import { JWT_SECRET } from "../lib/const";
-import { Context } from "../lib/interface";
+import { Context, Resolver } from "../lib/interface";
 import { PermissionManager } from "../lib/util";
 
-export const QueryResolver = {
+export const QueryResolver: Resolver<Query> = {
     GetMe: async (parent: Query, args: any, ctx: Context, info: any): Promise<Query["GetMe"]> => {
         //WARNING: GetMe doesn't need any permission validation
         if (ctx.user) {
@@ -27,14 +27,14 @@ export const QueryResolver = {
         PermissionManager.queryPermission(ctx.user, ModuleId.USERS, OperationIndex.RETRIEVE);
         return await Server.db.collection<User>("users").findOne({
             _id: args.id
-        });
+        }) as User;
     },
 
-    GetRole: async (parent: Query, args: QueryGetUserArgs, ctx: Context, info: any): Promise<Query["GetRole"]> => {
+    GetRole: async (parent: Query, args: QueryGetRoleArgs, ctx: Context, info: any): Promise<Query["GetRole"]> => {
         PermissionManager.queryPermission(ctx.user, ModuleId.ROLES, OperationIndex.RETRIEVE);
         return await Server.db.collection<Role>("roles").findOne({
             _id: args.id
-        });
+        }) as Role;
     },
 
     GetUsers: async (parent: Query, args: any, ctx: Context, info: any): Promise<Query["GetUsers"]> => {
@@ -48,7 +48,7 @@ export const QueryResolver = {
     }
 };
 
-export const MutationResolver = {
+export const MutationResolver: Resolver<Mutation> = {
     SignIn: async (parent: Mutation, args: MutationSignInArgs, ctx: Context, info: any): Promise<Mutation["SignIn"]> => {
         const user = await Server.db.collection<User>("users").findOne({
             username: args.username
@@ -115,12 +115,20 @@ export const ScalarResolver = {
     })
 }
 
-export const UserResolver = {
-    secret: () => null, //DANGER: This field must always return null
+export const UserResolver: Resolver<User> = {
+    _id: async (parent: User, args: any, ctx: Context, info: any) => parent._id,
+    
+    fineIds: async (parent: User, args: any, ctx: Context, info: any) => parent.fineIds,
+    
+    roleId: async (parent: User, args: any, ctx: Context, info: any) => parent.roleId,
+    
+    username: async (parent: User, args: any, ctx: Context, info: any) => parent.username,
+
+    secret: async (parent: User, args: any, ctx: Context, info: any) => null, //DANGER: This field must always return null
 
     role: async (parent: User, args: any, ctx: Context, info: any) => {
         PermissionManager.queryPermission(ctx.user, ModuleId.ROLES, OperationIndex.RETRIEVE);
-        return await Server.db.collection<Role>("roles").findOne({ _id: parent.roleId });
+        return await Server.db.collection<Role>("roles").findOne({ _id: parent.roleId }) as Role;
     },
 
     avatar: async (parent: User, args: any, ctx: Context, info: any) => {
@@ -138,22 +146,38 @@ export const UserResolver = {
     },
 };
 
-export const PermissionResolver = {
+export const PermissionResolver: Resolver<Permission> = {
+    _id: async (parent: Permission, args: any, ctx: Context, info: any) => parent._id,
+
+    moduleId: async (parent: Permission, args: any, ctx: Context, info: any) => parent.moduleId,
+    
+    value: async (parent: Permission, args: any, ctx: Context, info: any) => parent.value,
+
     module: async (parent: Permission, args: any, ctx: Context, info: any) => {
         //WARNING: Module details can be accessed by anyone
-        return await Server.db.collection<Module>("modules").findOne({ _id: parent.moduleId });
+        return await Server.db.collection<Module>("modules").findOne({ _id: parent.moduleId }) as Module;
     }
 };
 
-export const FineResolver = {
+export const FineResolver: Resolver<Fine> = {
+    _id: async (parent: Fine, args: any, ctx: Context, info: any) => parent._id,
+    
+    offenderId: async (parent: Fine, args: any, ctx: Context, info: any) => parent.offenderId,
+    
+    officerId: async (parent: Fine, args: any, ctx: Context, info: any) => parent.officerId,
+
+    offenseIds: async (parent: Fine, args: any, ctx: Context, info: any) => parent.offenseIds,
+
+    time: async (parent: Fine, args: any, ctx: Context, info: any) => parent.time,
+
     offender: async (parent: Fine, args: any, ctx: Context, info: any) => {
         PermissionManager.queryPermission(ctx.user, ModuleId.USERS, OperationIndex.RETRIEVE);
-        return await Server.db.collection<User>("users").findOne({_id: parent.offenderId });
+        return await Server.db.collection<User>("users").findOne({_id: parent.offenderId }) as User;
     },
 
     officer: async (parent: Fine, args: any, ctx: Context, info: any) => {
         PermissionManager.queryPermission(ctx.user, ModuleId.USERS, OperationIndex.RETRIEVE);
-        return await Server.db.collection<User>("users").findOne({_id: parent.officerId });
+        return await Server.db.collection<User>("users").findOne({_id: parent.officerId }) as User;
     },
 
     offenses: async (parent: Fine, args: any, ctx: Context, info: any) => {

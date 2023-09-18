@@ -1,5 +1,4 @@
 import { readFileSync } from "fs";
-import { Binary } from "mongodb";
 
 export enum OperationIndex { CREATE, RETRIEVE, UPDATE, DELETE }
 
@@ -11,5 +10,5 @@ export enum ModuleId {
 }
 
 export class DefaultBinData {
-    static readonly AVATAR = new Binary(readFileSync(__dirname + "/../media/images/icon_user_default.png"));
+    static readonly AVATAR = readFileSync(__dirname + "/../media/images/icon_user_default.png").toString();
 }

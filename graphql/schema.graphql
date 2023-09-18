@@ -4,8 +4,8 @@ scalar Date
 #QUERY==========================================
 type Query {
     GetMe: User!
-    GetUser(id: ObjectId!): User
-    GetRole(id: ObjectId!): Role
+    GetUser(id: ObjectId!): User!
+    GetRole(id: ObjectId!): Role!
     GetUsers: [User!]!
     GetRoles: [Role!]!
 }
