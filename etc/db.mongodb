@@ -1,13 +1,11 @@
-use('exam');
+use('finePay');
 
 db.modules.drop();
 const moduleInsertionResult = db.modules.insertMany([
-    { _id: ObjectId("609de429c2b27cd8f1401796"), name: "Settings", url: "Settings" },
     { _id: ObjectId("609de42bc2b27cd8f1401797"), name: "Roles", url: "Roles" },
     { _id: ObjectId("609de42dc2b27cd8f1401798"), name: "Users", url: "Users" },
-    { _id: ObjectId("609de42dc2b27cd8f1401799"), name: "Exams", url: "Exams" },
-    { _id: ObjectId("609de42dc2b27cd8f140179a"), name: "Questions", url: "Questions" },
-    { _id: ObjectId("60b3be1a6820bf8b2e5e47eb"), name: "Results", url: "Results" }
+    { _id: ObjectId("609de42dc2b27cd8f1401799"), name: "Offenses", url: "Offenses" },
+    { _id: ObjectId("609de42dc2b27cd8f1401700"), name: "Fines", url: "Fines" }
 ]);
 
 db.roles.drop();
@@ -19,20 +17,17 @@ const roleInsertionResult = db.roles.insertMany([
             { moduleId: moduleInsertionResult.insertedIds["0"], value: "1111" },
             { moduleId: moduleInsertionResult.insertedIds["1"], value: "1111" },
             { moduleId: moduleInsertionResult.insertedIds["2"], value: "1111" },
-            { moduleId: moduleInsertionResult.insertedIds["3"], value: "1111" },
-            { moduleId: moduleInsertionResult.insertedIds["4"], value: "1111" },
-            { moduleId: moduleInsertionResult.insertedIds["5"], value: "1111" }
+            { moduleId: moduleInsertionResult.insertedIds["3"], value: "1111" }
         ]
     },
     {
         _id: ObjectId("609de42dc2b27cd8f140179b"),
-        name: "Local",
+        name: "Officer",
         permissions: [
             { moduleId: moduleInsertionResult.insertedIds["0"], value: "0100" },
             { moduleId: moduleInsertionResult.insertedIds["1"], value: "0100" },
             { moduleId: moduleInsertionResult.insertedIds["2"], value: "0100" },
-            { moduleId: moduleInsertionResult.insertedIds["3"], value: "0100" },
-            { moduleId: moduleInsertionResult.insertedIds["4"], value: "0100" }
+            { moduleId: moduleInsertionResult.insertedIds["3"], value: "0100" }
         ]
     }
 ]);
@@ -54,51 +49,59 @@ const userInsertionResult = db.users.insertMany([
     }
 ]);
 
-db.questions.drop();
-const questionsInsertionResult = db.questions.insertMany([
+db.offenses.drop();
+const offenseInsertionResult = db.offenses.insertMany([
     {
-        _id: ObjectId("701de42dc2b27cd8f1401791"),
-        prompt: "This is question 1"
+        _id: ObjectId("701de42dc2b27cd8f1411791"),
+        name: "This is offense 1",
+        amount: 1000
     },
     {
-        _id: ObjectId("701de42dc2b27cd8f1401792"),
-        prompt: "This is question 2"
+        _id: ObjectId("701de42dc2b27cd8f1411792"),
+        name: "This is offense 2",
+        amount: 2000
     },
     {
-        _id: ObjectId("701de42dc2b27cd8f1401793"),
-        prompt: "This is question 3"
+        _id: ObjectId("701de42dc2b27cd8f1411793"),
+        name: "This is offense 3",
+        amount: 500
     },
     {
-        _id: ObjectId("701de42dc2b27cd8f1401794"),
-        prompt: "This is question 4"
+        _id: ObjectId("701de42dc2b27cd8f1411794"),
+        name: "This is offense 4",
+        amount: 3000
     },
     {
-        _id: ObjectId("701de42dc2b27cd8f1401795"),
-        prompt: "This is question 5"
+        _id: ObjectId("701de42dc2b27cd8f1411795"),
+        name: "This is offense 5",
+        amount: 4000
     }
 ]);
 
-db.exams.drop();
-const examsInsertionResult = db.exams.insertMany([
+db.fines.drop();
+const fineInsertionResult = db.fines.insertMany([
     {
-        _id: ObjectId("809de42dc2b27cd8f1401791"),
-        name: "PH1014",
-        startTime: 1693465508844,
-        durationHours: 2,
-        questionIds: [
-            questionsInsertionResult.insertedIds["0"],
-            questionsInsertionResult.insertedIds["1"]
-        ]
+        _id: ObjectId("a01de42dc2b27cd8f1411791"),
+        offenderId: userInsertionResult.insertedIds[0],
+        officerId: userInsertionResult.insertedIds[1],
+        offenseIds: [
+            offenseInsertionResult.insertedIds[0],
+            offenseInsertionResult.insertedIds[4]
+        ],
+        time: new Date()
     },
     {
-        _id: ObjectId("809de42dc2b27cd8f1401792"),
-        name: "AM1014",
-        startTime: 1693465508844,
-        durationHours: 3,
-        questionIds: [
-            questionsInsertionResult.insertedIds["2"],
-            questionsInsertionResult.insertedIds["3"],
-            questionsInsertionResult.insertedIds["4"]
-        ]
+        _id: ObjectId("a01de42dc2b27cd8f1411792"),
+        offenderId: userInsertionResult.insertedIds[0],
+        officerId: userInsertionResult.insertedIds[1],
+        offenseIds: [
+            offenseInsertionResult.insertedIds[1],
+            offenseInsertionResult.insertedIds[2],
+            offenseInsertionResult.insertedIds[4]
+        ],
+        time: new Date(),
+        payment: {
+            time: new Date()
+        },
     }
 ]);

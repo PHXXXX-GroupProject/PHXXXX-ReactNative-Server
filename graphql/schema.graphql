@@ -6,10 +6,8 @@ type Query {
     GetMe: User!
     GetUser(id: ObjectId!): User
     GetRole(id: ObjectId!): Role
-    GetExam(id: ObjectId!): Exam
     GetUsers: [User!]!
     GetRoles: [Role!]!
-    GetExams: [Exam!]!
 }
 
 type User {
@@ -20,6 +18,9 @@ type User {
     secret: Secret #DANGER: Must always be null for outsiders
     preferredName: String
     avatar: String
+
+    fineIds: [ObjectId!]!
+    fines: [Fine!]!
 }
 
 type Secret {
@@ -45,31 +46,26 @@ type Module {
     url: String!
 }
 
-type Exam {
+type Fine {
+    _id: ObjectId!
+    offenderId: ObjectId!
+    offender: User!
+    officerId: ObjectId!
+    officer: User!
+    offenseIds: [ObjectId!]!
+    offenses: [Offense!]!
+    time: Date!
+    payment: Payment
+}
+
+type Offense {
     _id: ObjectId!
     name: String!
-    startTime: Date!
-    durationHours: Int!
-    questionIds: [ObjectId!]!
-    questions: [Question!]!
+    amount: Int!
 }
 
-type Question {
-    _id: ObjectId!
-    prompt: String!
-}
-
-type ExamSitting {
-    _id: ObjectId!
-    exam: Exam!
-    user: User!
-    answers: [Answer!]!
-}
-
-type Answer {
-    _id: ObjectId!
-    questionId: ObjectId!
-    text: String!
+type Payment {
+    time: Date!
 }
 
 #MUTATION========================================
