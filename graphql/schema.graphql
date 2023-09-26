@@ -6,6 +6,7 @@ type Query {
     GetMe: User!
     GetUser(id: ObjectId!): User!
     GetRole(id: ObjectId!): Role!
+    GetFine(id: ObjectId!): Fine!
     GetUsers: [User!]!
     GetRoles: [Role!]!
 }

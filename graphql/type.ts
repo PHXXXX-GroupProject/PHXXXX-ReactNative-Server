@@ -70,11 +70,17 @@ export type Permission = {
 
 export type Query = {
   __typename?: 'Query';
+  GetFine: Fine;
   GetMe: User;
   GetRole: Role;
   GetRoles: Array<Role>;
   GetUser: User;
   GetUsers: Array<User>;
+};
+
+
+export type QueryGetFineArgs = {
+  id: Scalars['ObjectId']['input'];
 };
 
 

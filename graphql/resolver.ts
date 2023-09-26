@@ -7,7 +7,7 @@ import { GraphQLScalarType, Kind } from "graphql";
 
 import * as Error from "../lib/error";
 import { Server } from "../lib/app";
-import { Fine, Module, Mutation, MutationSignInArgs, Offense, Permission, Query, QueryGetRoleArgs, QueryGetUserArgs, Role, User } from "./type";
+import { Fine, Module, Mutation, MutationSignInArgs, Offense, Permission, Query, QueryGetFineArgs, QueryGetRoleArgs, QueryGetUserArgs, Role, User } from "./type";
 import { DefaultBinData, ModuleId, OperationIndex } from "../lib/enum";
 import { JWT_SECRET } from "../lib/const";
 import { Context, Resolver } from "../lib/interface";
@@ -35,6 +35,13 @@ export const QueryResolver: Resolver<Query> = {
         return await Server.db.collection<Role>("roles").findOne({
             _id: args.id
         }) as Role;
+    },
+
+    GetFine: async (parent: Query, args: QueryGetFineArgs, ctx: Context, info: any): Promise<Query["GetFine"]> => {
+        PermissionManager.queryPermission(ctx.user, ModuleId.FINES, OperationIndex.RETRIEVE);
+        return await Server.db.collection<Fine>("fines").findOne({
+            _id: args.id
+        }) as Fine;
     },
 
     GetUsers: async (parent: Query, args: any, ctx: Context, info: any): Promise<Query["GetUsers"]> => {
