@@ -7,8 +7,8 @@ import { GraphQLScalarType, Kind } from "graphql";
 
 import * as Error from "../lib/error";
 import { Server } from "../lib/app";
-import { Fine, Module, Mutation, MutationSignInArgs, Offense, Permission, Query, QueryGetFineArgs, QueryGetRoleArgs, QueryGetUserArgs, Role, User } from "./type";
-import { DefaultBinData, ModuleId, OperationIndex } from "../lib/enum";
+import { Fine, Module, Mutation, MutationPayFineArgs, MutationSignInArgs, Offense, Permission, Query, QueryGetFineArgs, QueryGetRoleArgs, QueryGetUserArgs, Role, User } from "./type";
+import { DefaultBinData, ModuleId, ModuleName, OperationIndex, OperationName } from "../lib/enum";
 import { JWT_SECRET } from "../lib/const";
 import { Context, Resolver } from "../lib/interface";
 import { PermissionManager } from "../lib/util";
@@ -70,6 +70,26 @@ export const MutationResolver: Resolver<Mutation> = {
             }
         } else {
             throw new Error.CouldNotFindUser(args.username);
+        }
+    },
+
+    PayFine: async (parent: Mutation, args: MutationPayFineArgs, ctx: Context, info: any): Promise<Mutation["PayFine"]> => {
+        console.log(args.info.fineId);
+        
+        let result = await Server.db.collection<Fine>("fines").updateOne({
+            _id: args.info.fineId
+        }, {
+            $set: {
+                payment: {
+                    time: new Date()
+                }
+            }
+        });
+
+        if (result.acknowledged) {
+            return true;
+        } else {
+            throw new Error.CouldNotPerformOperation(ModuleName.FINES, OperationName.UPDATE);
         }
     }
 };

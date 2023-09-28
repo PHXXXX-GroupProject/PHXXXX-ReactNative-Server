@@ -39,7 +39,13 @@ export type Module = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  PayFine: Scalars['Boolean']['output'];
   SignIn: Scalars['String']['output'];
+};
+
+
+export type MutationPayFineArgs = {
+  info: PayFineInfo;
 };
 
 
@@ -53,6 +59,14 @@ export type Offense = {
   _id: Scalars['ObjectId']['output'];
   amount: Scalars['Int']['output'];
   name: Scalars['String']['output'];
+};
+
+export type PayFineInfo = {
+  cardCVC: Scalars['String']['input'];
+  cardExpMonth: Scalars['String']['input'];
+  cardExpYear: Scalars['String']['input'];
+  cardNo: Scalars['String']['input'];
+  fineId: Scalars['ObjectId']['input'];
 };
 
 export type Payment = {

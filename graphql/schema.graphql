@@ -72,4 +72,13 @@ type Payment {
 #MUTATION========================================
 type Mutation {
     SignIn(username: String!, password: String!): String!
+    PayFine(info: PayFineInfo!): Boolean!
+}
+
+input PayFineInfo {
+    fineId: ObjectId!,
+    cardNo: String!,
+    cardExpMonth: String!,
+    cardExpYear: String!,
+    cardCVC: String!,
 }
