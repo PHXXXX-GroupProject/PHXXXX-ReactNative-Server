@@ -95,6 +95,26 @@ const fineInsertionResult = db.fines.insertMany([
         offenderId: userInsertionResult.insertedIds[0],
         officerId: userInsertionResult.insertedIds[1],
         offenseIds: [
+            offenseInsertionResult.insertedIds[0],
+            offenseInsertionResult.insertedIds[4]
+        ],
+        time: new Date()
+    },
+    {
+        _id: ObjectId("a01de42dc2b27cd8f1411794"),
+        offenderId: userInsertionResult.insertedIds[0],
+        officerId: userInsertionResult.insertedIds[1],
+        offenseIds: [
+            offenseInsertionResult.insertedIds[0],
+            offenseInsertionResult.insertedIds[4]
+        ],
+        time: new Date()
+    },
+    {
+        _id: ObjectId("a01de42dc2b27cd8f1411793"),
+        offenderId: userInsertionResult.insertedIds[0],
+        officerId: userInsertionResult.insertedIds[1],
+        offenseIds: [
             offenseInsertionResult.insertedIds[1],
             offenseInsertionResult.insertedIds[2],
             offenseInsertionResult.insertedIds[4]
