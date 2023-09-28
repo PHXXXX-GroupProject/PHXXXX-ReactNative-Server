@@ -74,8 +74,6 @@ export const MutationResolver: Resolver<Mutation> = {
     },
 
     PayFine: async (parent: Mutation, args: MutationPayFineArgs, ctx: Context, info: any): Promise<Mutation["PayFine"]> => {
-        console.log(args.info.fineId);
-        
         let result = await Server.db.collection<Fine>("fines").updateOne({
             _id: args.info.fineId
         }, {
